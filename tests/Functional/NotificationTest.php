@@ -23,11 +23,6 @@ class NotificationTest extends Unit
             'notification' => 'app\commands\NotificationController',
         ];
 
-        /**
-         * Тут впустую потрачен час. Может и больше
-         * Почему? Я решил что не гоже писать в лог контейнера и решил в лог фреймворка написать
-         * а gemini убедил меня что с легкостью мне поможет мокнуть логгер. В очередной раз он облажался
-         */
         $loggerMock = new class extends Logger {
             public $capturedMessages = [];
             public function log($message, $level, $category = 'notification'): void

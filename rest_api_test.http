@@ -52,3 +52,15 @@ Authorization: Bearer {{auth_token}}
 }
 
 ###
+
+
+POST http://localhost:8000/api/reminders/1/take
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+    "medicine_id": 1
+}
+
+###
