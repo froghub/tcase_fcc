@@ -16,7 +16,7 @@ up:
 down:
 	docker compose down
 test:
-	docker compose exec php php yii migrate/fresh --appconfig=config/console_test.php --interactive=0
+	docker compose exec php php yii migrate/fresh --interactive=0
 	docker compose exec  php vendor/bin/codecept run Functional
 %:
 	@:

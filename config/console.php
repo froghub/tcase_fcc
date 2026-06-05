@@ -1,5 +1,7 @@
 <?php
 
+use yii\di\Instance;
+
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 
@@ -12,6 +14,23 @@ $config = [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
         '@tests' => '@app/tests',
+    ],
+    'container' => [
+        'definitions' => [
+            'app\services\NotifierInterface' => 'app\services\LogNotifier',
+
+            /**
+             * Пока так и не понял как работает сервис-контейнер, но работает криво
+             * Костыляем его кривизну:
+             */
+            'app\repositories\ReminderRepository' => [
+                'class' => 'app\repositories\ReminderRepository',
+                '__construct()' => [\yii\di\Instance::of('db')],
+            ],
+            'db' => function () {
+                return \Yii::$app->get('db');
+            },
+        ],
     ],
     'components' => [
         'cache' => [
@@ -27,8 +46,8 @@ $config = [
                 [
                     'class' => \yii\log\FileTarget::class,
                     'levels' => ['info'],
-                    'categories' => ['console'],
-                    'logFile' => '@runtime/logs/console.log',
+                    'categories' => ['notification'],
+                    'logFile' => '@runtime/logs/notification.log',
                     'logVars' => [],
                     'exportInterval' => 1,
                 ],

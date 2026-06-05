@@ -30,7 +30,7 @@ class NotificationTest extends Unit
          */
         $loggerMock = new class extends Logger {
             public $capturedMessages = [];
-            public function log($message, $level, $category = 'application'): void
+            public function log($message, $level, $category = 'notification'): void
             {
                 $this->capturedMessages[] = [
                     'message' => is_array($message) ? json_encode($message) : (string) $message,
@@ -77,13 +77,12 @@ class NotificationTest extends Unit
         $this->assertTrue($reminder->save(), 'Unable to save reminder');
 
         Yii::$app->runAction('notification/check');
-
         $logs = $loggerMock->capturedMessages;
         $this->assertNotEmpty($logs, 'Логгер не поймал ни одного сообщения.');
 
         $hasNotification = false;
         foreach ($logs as $msg) {
-            if (str_contains($msg['message'], 'УВЕДОМЛЕНИЕ:') && str_contains($msg['message'], 'Пользователю ' . $user->id)) {
+            if (str_contains($msg['message'], 'Напоминание:') && str_contains($msg['message'], 'пользователю ' . $user->id)) {
                 $hasNotification = true;
                 break;
             }

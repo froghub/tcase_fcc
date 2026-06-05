@@ -18,6 +18,7 @@ return [
         '@npm'   => '@vendor/npm-asset',
     ],
     'language' => 'en-US',
+
     'components' => [
         'db' => $db,
         'mailer' => [
@@ -26,6 +27,7 @@ return [
             'useFileTransport' => true,
             'viewPath' => '@app/mail',
         ],
+
         'assetManager' => [
             'basePath' => __DIR__ . '/../web/assets',
         ],
