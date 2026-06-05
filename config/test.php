@@ -11,6 +11,7 @@ return [
     'basePath' => dirname(__DIR__),
     'bootstrap' => [
         \app\tests\Support\MailerBootstrap::class,
+        'log'
     ],
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
@@ -32,6 +33,7 @@ return [
             'showScriptName' => true,
         ],
         'user' => [
+//            'class' => \app\models\User::class,
             'identityClass' => \app\models\User::class,
         ],
         'request' => [
@@ -44,6 +46,12 @@ return [
             ],
             */
         ],
+        'log' => [
+            'targets' => [
+
+            ],
+        ],
+
     ],
     'params' => $params,
 ];

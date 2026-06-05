@@ -1,0 +1,54 @@
+POST http://localhost:8000/auth/login
+Content-Type: application/json
+
+{
+    "email": "m@m.m",
+    "password": "123"
+}
+> {%
+    client.global.set("auth_token", response.body.token);
+%}
+###
+
+GET http://localhost:8000/api/medicines
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+###
+
+POST http://localhost:8000/api/medicines
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+    "name": "Парацетамол",
+    "dose": "200 мг",
+    "description": "При температуре"
+}
+
+###
+
+
+GET http://localhost:8000/api/reminders
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+###
+
+POST http://localhost:8000/api/reminders
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+    "medicine_id": 1,
+    "time": ["09:00","18:00"],
+    "begin_date": "2026-06-01",
+    "finish_date": "2026-06-10",
+    "comment": "После еды"
+}
+
+###

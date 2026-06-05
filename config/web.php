@@ -25,6 +25,9 @@ $config = [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => '8SRVpMNC-ii1wraV5xJMaeJ1E2vpkLuN',
+            'parsers' => [
+                'application/json' => 'yii\web\JsonParser',
+            ]
         ],
         'cache' => [
             'class' => \yii\caching\FileCache::class,
@@ -47,14 +50,21 @@ $config = [
             ],
         ],
         'db' => $db,
-        /*
         'urlManager' => [
             'enablePrettyUrl' => true,
+            'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
+                ['class' => 'yii\rest\UrlRule', 'controller' => 'user'],
+                'POST auth/login' => 'login/login',
+                'GET api/medicines' => 'medicine/index',
+                'POST api/medicines' => 'medicine/create',
+                'GET api/reminders' => 'reminder/index',
+                'POST api/reminders' => 'reminder/create',
+                'POST api/reminders/<id:\d+>/take' => 'reminder/take',
+                'DELETE api/reminders/<id:\d+>' => 'reminder/delete',
             ],
         ],
-        */
     ],
     'params' => $params,
 ];

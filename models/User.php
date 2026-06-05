@@ -4,40 +4,33 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key as JwtKey;
 use yii\base\BaseObject;
+use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
 
-class User extends BaseObject implements IdentityInterface
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $email
+ * @property string $password_hash
+ * @property int $created_at
+ * @property int $updated_at
+ */
+class User extends ActiveRecord implements IdentityInterface
 {
-    public int|string $id = '';
-    public string $username = '';
-    public string $passwordHash = '';
-    public string $authKey = '';
-    public string $accessToken = '';
-    private static array $_users = [
-        '100' => [
-            'id' => '100',
-            'username' => 'admin',
-            // password: admin
-            'passwordHash' => '$2y$13$gYAywKSkhfZDq9FLNdm7buKnvlRxDexf5xipSMAxQPDUxpaptmZJu',
-            'authKey' => 'test100key',
-            'accessToken' => '100-token',
-        ],
-        '101' => [
-            'id' => '101',
-            'username' => 'demo',
-            // password: demo
-            'passwordHash' => '$2y$13$alRLq1PGVMlGYwS/Y3iy3ewQns1Z8ol8Iq6Zb5k7ZwEhblA1aL29y',
-            'authKey' => 'test101key',
-            'accessToken' => '101-token',
-        ],
-    ];
+    public static function tableName(): string
+    {
+        return '{{%users}}';
+    }
+
     /**
      * {@inheritdoc}
      */
     public static function findIdentity($id): static|null
     {
-        return isset(self::$_users[$id]) ? new static(self::$_users[$id]) : null;
+        return static::findOne($id);
     }
 
     /**
@@ -45,30 +38,39 @@ class User extends BaseObject implements IdentityInterface
      */
     public static function findIdentityByAccessToken($token, $type = null): static|null
     {
-        foreach (self::$_users as $user) {
-            if ($user['accessToken'] === $token) {
-                return new static($user);
-            }
+        try {
+            $secret = $_ENV['JWT_SECRET_KEY'] ?? 'fallback_secret';
+            $decoded = JWT::decode($token, new JwtKey($secret, 'HS256'));
+            return static::findOne($decoded->uid);
+        } catch (\Exception $e) {
+            error_log('JWT Validation Error: ' . $e->getMessage());
+            return null;
         }
+    }
 
-        return null;
+    public function generateJwt(): string
+    {
+        $secretKey = $_ENV['JWT_SECRET_KEY'] ?? 'fallback_secret';
+
+        $payload = [
+            'iss' => 'localhost', //кто
+            'aud' => 'localhost', //для кого
+            'iat' => time(), //время
+            'exp' => time() + 3600, //годность
+            'uid' => $this->id
+        ];
+        return JWT::encode($payload, $secretKey, 'HS256');
     }
 
     /**
-     * Finds user by username
+     * Finds user by email
      *
-     * @param string $username
+     * @param string $email
      * @return static|null
      */
-    public static function findByUsername(string $username): static|null
+    public static function findByEmail(string $email): static|null
     {
-        foreach (self::$_users as $user) {
-            if (strcasecmp($user['username'], $username) === 0) {
-                return new static($user);
-            }
-        }
-
-        return null;
+        return static::findOne(['email' => $email]);
     }
 
     /**
@@ -84,7 +86,7 @@ class User extends BaseObject implements IdentityInterface
      */
     public function getAuthKey(): string|null
     {
-        return $this->authKey;
+        return null;
     }
 
     /**
@@ -92,6 +94,15 @@ class User extends BaseObject implements IdentityInterface
      */
     public function validateAuthKey($authKey): bool
     {
-        return $this->authKey === $authKey;
+        return false;
+    }
+
+    public function setPassword($password): void
+    {
+        $this->password_hash = \Yii::$app->security->generatePasswordHash($password);
+    }
+    public function validatePassword($password): bool
+    {
+        return \Yii::$app->security->validatePassword($password, $this->password_hash);
     }
 }
