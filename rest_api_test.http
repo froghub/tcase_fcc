@@ -1,4 +1,4 @@
-POST http://localhost:8000/auth/login
+POST http://localhost:8000/api/login
 Content-Type: application/json
 
 {
@@ -46,8 +46,8 @@ Authorization: Bearer {{auth_token}}
 {
     "medicine_id": 1,
     "time": ["09:00","18:00"],
-    "begin_date": "2026-06-01",
-    "finish_date": "2026-06-10",
+    "begin_date": "2026-06-17",
+    "finish_date": "2026-06-20",
     "comment": "После еды"
 }
 

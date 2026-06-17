@@ -56,7 +56,7 @@ $config = [
             'showScriptName' => false,
             'rules' => [
                 ['class' => 'yii\rest\UrlRule', 'controller' => 'user'],
-                'POST auth/login' => 'login/login',
+                'POST api/login' => 'login/login',
                 'GET api/medicines' => 'medicine/index',
                 'POST api/medicines' => 'medicine/create',
                 'GET api/reminders' => 'reminder/index',
