@@ -52,7 +52,6 @@ class Reminder extends ActiveRecord
 
     public function fields(): array
     {
-        $dates = array_map('trim', explode(',', trim($this->period, '[]()')));
         return [
             'medicine_id',
             'time' => function ($model) {
