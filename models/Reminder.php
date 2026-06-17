@@ -18,6 +18,7 @@ class Reminder extends ActiveRecord
     public $begin_date;
     public $finish_date;
     public $time;
+
     public static function tableName()
     {
         return '{{%reminders}}';
@@ -51,14 +52,35 @@ class Reminder extends ActiveRecord
 
     public function fields(): array
     {
-        $dates = array_map('trim', explode(',', trim($this->period, '[]()'))) ;
+        $dates = array_map('trim', explode(',', trim($this->period, '[]()')));
         return [
             'medicine_id',
             'time' => function ($model) {
                 return $model->times instanceof ArrayExpression ? $model->times->getValue() : $model->times;
             },
-            'begin_date' => fn() => $dates[0] ?? null,
-            'finish_date' => fn() => $dates[1] ?? null,
+            'begin_date' => function ($model) {
+                if (empty($model->period)) {
+                    return null;
+                }
+
+                $dates = array_map('trim', explode(',', trim($model->period, '[]()')));
+
+                return $dates[0] ?? null;
+            },
+            'finish_date' => function ($model) {
+                if (empty($model->period)) {
+                    return null;
+                }
+
+                $isUpperExcluded = str_ends_with(trim($model->period), ')');
+                $dates = array_map('trim', explode(',', trim($model->period, '[]()')));
+                $endDate = $dates[1] ?? null;
+                if ($isUpperExcluded && $endDate) { //исправляем особенность хранения периода postgres
+                    return date('Y-m-d', strtotime($endDate . ' -1 day'));
+                }
+
+                return $endDate;
+            },
             'comment',
         ];
     }
